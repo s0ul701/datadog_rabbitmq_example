@@ -1,0 +1,44 @@
+version: '3.3'
+services:
+  rabbitmq:
+    build:
+      context: ./rabbitmq
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./rabbitmq/.env
+    ports:
+      - 5672:5672
+    volumes:
+      - ./rabbitmq_logs:/rabbitmq_logs
+    labels:
+      com.datadoghq.ad.check_names: '["rabbitmq"]'
+      com.datadoghq.ad.init_configs: '[{}]'
+      com.datadoghq.ad.instances: >-
+        [{
+          "rabbitmq_api_url": "http://%%host%%:15672/api/",
+          "username": "<DATADOG_USER>",
+          "password": "<DATADOG_PASSWORD>"
+        }]
+      com.datadoghq.ad.logs: >-
+        [{
+          "type": "file",
+          "source": "rabbitmq",
+          "service": "rabbitmq",
+          "path": "/rabbitmq_logs/rabbitmq.logs",
+          "log_processing_rules": [{
+            "type": "multi_line",
+            "name": "logs",
+            "pattern": "\\d{4}-\\d{2}-\\d{2}"
+          }]
+        }]
+
+  datadog-agent:
+    image: datadog/agent:7.26.0-jmx
+    env_file:
+      - ./datadog.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      - /opt/datadog-agent/run:/opt/datadog-agent/run:rw
+      - ./rabbitmq_logs:/rabbitmq_logs

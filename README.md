@@ -39,7 +39,7 @@ services:
 
 ```yaml
 DD_API_KEY=<YOUR_DATADOG_API_KEY>
-DD_SITE=<YOUR_DATADOG_DOMEN>
+DD_SITE=<YOUR_DATADOG_DOMAIN>
 
 DD_PROCESS_AGENT_ENABLED=true   # позволяет просматривать процессы сервера/контейнеров в DataDog
 ```
@@ -78,8 +78,8 @@ services:
             com.datadoghq.ad.instances: >-  # основной блок настройки соединения DataDog и RabbitMQ
                 [{
                     "rabbitmq_api_url": "http://%%host%%:15672/api/", # URL-адрес API RabbitMQ с шаблонной переменной имени хоста
-                    "username": "datadog",      # имя пользователя и его пароль
-                    "password": "password"      № в RabbitMQ для мониторинга
+                    "username": "<DATADOG_USER>",      # имя пользователя и его пароль
+                    "password": "DATADOG_PASSWORD"      № в RabbitMQ для мониторинга
                 }]
             com.datadoghq.ad.logs: >-
                 [{
@@ -103,7 +103,7 @@ services:
             - /proc/:/host/proc/:ro
             - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
             - /opt/datadog-agent/run:/opt/datadog-agent/run:rw  # вольюм позволяет сохранять логи локально на случай непредвиденных ситуаций
-            - ./rabbitmq_logs:/rabbitmq_logs    # вольюм прокидывает логи Redis-контейнера в DataDog-контейнер
+            - ./rabbitmq_logs:/rabbitmq_logs    # вольюм прокидывает логи RabbitMQ-контейнера в DataDog-контейнер
 
     ...more other services...
 ```
@@ -168,9 +168,7 @@ log.file.level = debug          # уровень логирования
 
 ```yaml
 DD_API_KEY=<DATADOG_API_KEY>
-DD_SITE=<DATADOG_DOMEN>
-
-REDIS_PASSWORD=<REDIS_PASSWORD>   # пароль от Redis (такой же, как и в конфиге Redis)
+DD_SITE=<DATADOG_DOMAIN>
 
 DD_PROCESS_AGENT_ENABLED=true   # позволяет DataDog-агенту просматривать процессы сервера/контейнеров в DataDog
 DD_LOGS_ENABLED=true    # позволяет DataDog-агенту собирать логи с сервера/контейнеров
